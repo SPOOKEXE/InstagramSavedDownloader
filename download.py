@@ -22,7 +22,14 @@ print("Logged in.")
 
 print("Scanning post collection - all items.")
 try:
-	collection = cl.collection_medias('All Posts', amount=9999)
+	last_pk = 0
+	try:
+		with open("failed.txt", "a") as file:
+			last_pk = file.readlines()[-1]
+		print("Starting from last failed media.")
+	except:
+		print("Could not find last failed item.")
+	collection = cl.collection_medias('All Posts', amount=9999, last_media_pk=last_pk)
 except Exception as e:
 	print("Failed to get all posts - reason: ")
 	print(e)

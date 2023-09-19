@@ -152,6 +152,7 @@ cython_debug/
 #.idea/
 
 credentials
+failed.txt
 /album/
 /photos/
 /videos/
