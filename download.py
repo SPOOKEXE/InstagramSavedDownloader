@@ -5,8 +5,10 @@ from os import makedirs
 
 def get_credentials( ) -> tuple:
 	try:
-		with open("credentials", "r") as file:
-			return tuple( file.readlines() )
+		# with open("credentials", "r") as file:
+		#	tuple( file.readlines() )
+		print("Enter your username and password separated by a space.")
+		return input().split(" ")
 	except Exception as exception:
 		print("Failed to read credentials file.")
 		print( exception )
@@ -28,7 +30,7 @@ try:
 			last_pk = file.readlines()[-1]
 		print("Starting from last failed media.")
 	except:
-		print("Could not find last failed item.")
+		print("Could not find last failed item. Starting normally.")
 	collection = cl.collection_medias('All Posts', amount=9999, last_media_pk=last_pk)
 except Exception as e:
 	print("Failed to get all posts - reason: ")
