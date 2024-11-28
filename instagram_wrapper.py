@@ -61,7 +61,7 @@ def download_media_item( client : instagrapi.Client, item : Media, directory : s
 			success = False
 	return (success, item)
 
-def bulk_download_media( client : instagrapi.Client, media : list[Media], directory : str, processes : int = 2 ) -> list[Media]:
+def bulk_download_media( client : instagrapi.Client, media : list[Media], directory : str, processes : int = 1 ) -> list[Media]:
 	'''Any media that failed to download will be returned.'''
 	pool = futures.ProcessPoolExecutor(processes)
 
@@ -89,7 +89,7 @@ def bulk_download_collections( client : instagrapi.Client, collections : list[Co
 		failed[item.name] = []
 		print(f'Downloading collection {item.name} with a total of {item.media_count} media items.')
 		media : list[Media] = client.collection_medias( item.name, item.media_count, last_media_pk=0 )
-		failed_items : list[Media] = bulk_download_media( client, media, "downloads", processes=2 )
+		failed_items : list[Media] = bulk_download_media( client, media, "downloads", processes=1 )
 		failed[item.name].extend( failed_items )
 	return failed
 
