@@ -91,7 +91,7 @@ def bulk_download_collections( client : instagrapi.Client, collections : list[Co
 		failed[item.name] = []
 		print(f'Downloading collection {item.name} with a total of {item.media_count} media items.')
 		# Initialize the primary key (last_pk) to fetch the first media item
-		chunk_size : int = 8
+		chunk_size : int = 32
 		total : int = 0
 		last_pk = 0
 		while True:
