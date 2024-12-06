@@ -3,6 +3,7 @@ from typing import Union
 from instagrapi.types import Media, Collection
 from concurrent import futures
 
+import time
 import os
 import traceback
 import instagrapi
@@ -59,6 +60,7 @@ def download_media_item( client : instagrapi.Client, item : Media, directory : s
 		except Exception as e:
 			traceback.print_exception(e)
 			success = False
+	time.sleep(2)
 	return (success, item)
 
 def bulk_download_media( client : instagrapi.Client, media : list[Media], directory : str, processes : int = 1 ) -> list[Media]:
@@ -84,17 +86,25 @@ def bulk_download_media( client : instagrapi.Client, media : list[Media], direct
 	return failed
 
 def bulk_download_collections( client : instagrapi.Client, collections : list[Collection] ) -> dict[str, list[Media]]:
-	failed : dict[str, list[Media] ] = {}
+	failed: dict[str, list[Media]] = {}
 	for item in collections:
 		failed[item.name] = []
 		print(f'Downloading collection {item.name} with a total of {item.media_count} media items.')
-		media : list[Media] = client.collection_medias( item.name, item.media_count, last_media_pk=0 )
-		failed_items : list[Media] = bulk_download_media( client, media, "downloads", processes=1 )
-		failed[item.name].extend( failed_items )
+		# Initialize the primary key (last_pk) to fetch the first media item
+		last_pk = 0
+		while True:
+			# Fetch the next media item using the last_pk
+			media: list[Media] = client.collection_medias(item.name, 1, last_media_pk=last_pk)
+			if not media:
+				# If there are no more media items to download, break the loop
+				break
+			# Process the media item (download it)
+			failed_items: list[Media] = bulk_download_media(client, media, "downloads", processes=1)
+			# Update the last_pk to the last media item's pk
+			last_pk = media[-1].pk
+			# Add any failed downloads to the failed list
+			failed[item.name].extend(failed_items)
 	return failed
-
-def download_from_json_file( client : instagrapi.Client, filepath : str, directory : str ) -> list[Media]:
-	raise NotImplementedError
 
 if __name__ == '__main__':
 
